@@ -85,8 +85,13 @@ struct MealCellView: View {
     private struct MealDescriptionAndImageView: View {
 
         @EnvironmentObject var navigationManager: NavigationManager
+        @Environment(\.imageViewerNamespace) private var imageViewerNamespace
 
         var meal: Meal
+
+        private var isThisImageActive: Bool {
+            navigationManager.imagePopoverActive && navigationManager.imagePopoverURL == meal.imageURL
+        }
 
         var body: some View {
             HStack {
@@ -101,10 +106,7 @@ struct MealCellView: View {
                 }
                 Spacer()
                 if let url = meal.imageURL {
-                    Button {
-                        navigationManager.imagePopoverURLString = url.absoluteString
-                        navigationManager.imagePopoverShown = true
-                    } label: {
+                    Button(action: { expandImage(url: url) }) {
                         Group {
                             URLImage(url: url) {
                                 Color.gray
@@ -120,10 +122,25 @@ struct MealCellView: View {
                         }
                         .scaledToFill()
                         .frame(width: 60, height: 60)
-                        .cornerRadius(10)
+                        .clipShape(.rect(cornerRadius: 10))
+                        .opacity(isThisImageActive ? 0 : 1)
+                        .matchedGeometryEffect(
+                            id: url.absoluteString,
+                            in: imageViewerNamespace!,
+                            isSource: !isThisImageActive
+                        )
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("VIEW_MEAL_IMAGE")
                 }
+            }
+        }
+
+        private func expandImage(url: URL) {
+            navigationManager.imagePopoverURL = url
+            navigationManager.imagePopoverShown = true
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                navigationManager.imagePopoverActive = true
             }
         }
     }

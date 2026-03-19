@@ -67,13 +67,19 @@ class NavigationManager: ObservableObject, @unchecked Sendable {
     /// - Important: This property is not used in watchOS.
     @Published var universalLinkAlertShown = false
 
-    /// A boolean property that indicates whether the meal image popover is currently shown.
+    /// Whether the image viewer overlay exists in the view hierarchy.
+    /// Set without animation to instantly show/hide the overlay.
     /// - Important: This property is not available on watchOS.
     @Published var imagePopoverShown = false
 
-    /// A string property that holds the URL of the meal image to be displayed in the popover.
+    /// Whether the image viewer is in its expanded state.
+    /// Set with animation to trigger the matchedGeometryEffect morph.
     /// - Important: This property is not available on watchOS.
-    @Published var imagePopoverURLString = ""
+    @Published var imagePopoverActive = false
+
+    /// The URL of the meal image to be displayed in the fullscreen viewer.
+    /// - Important: This property is not available on watchOS.
+    @Published var imagePopoverURL: URL?
 #endif
 
     /// A set that holds any cancellable subscribers to manage the lifecycle of subscriptions.

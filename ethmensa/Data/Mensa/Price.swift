@@ -42,7 +42,9 @@ class Price: Identifiable {
     }
 
     /// Returns the price as a string according to user settings.
-    func getString() -> String {
+    func getString() -> String? {
+        let prices = [student, staff, extern].compactMap { $0 }
+        guard !prices.isEmpty else { return nil }
         let fullString = [
             (student ?? 0).toCHFstring(),
             (staff ?? 0).toCHFstring(),
@@ -51,9 +53,9 @@ class Price: Identifiable {
 #if !APPCLIP
         return switch SettingsManager.shared.priceType {
         case .all: fullString
-        case .student: ([student, staff, extern].compactMap { $0 }.first?.toCHFstring() ?? "NaN") + currencyString
-        case .staff: ([staff, extern].compactMap { $0 }.first?.toCHFstring() ?? "NaN") + currencyString
-        case .external: (extern?.toCHFstring() ?? "NaN") + currencyString
+        case .student: [student, staff, extern].compactMap { $0 }.first.map { $0.toCHFstring() + currencyString }
+        case .staff: [staff, extern].compactMap { $0 }.first.map { $0.toCHFstring() + currencyString }
+        case .external: extern.map { $0.toCHFstring() + currencyString }
         }
 #else
         return fullString
